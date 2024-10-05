@@ -2,41 +2,72 @@ const axios = require('axios');
 
 let pokemons = [
     'bulbasaur',
+    'ivysaur',
+    'venusaur',
     'charmander',
-    'squirtle'
-]
+    'charmeleon',
+    'charizard',
+    'squirtle',
+    'wartortle',
+    'blastoise',
+    'pikachu',
+    'jigglypuff',
+    'eevee',
+    'snorlax',
+    'mewtwo'
+];
+
+let availability = [
+    ['bulbasaur', ['2024-10-01', '2024-10-02']],
+    ['ivysaur', ['2024-10-02', '2024-10-03']],
+    ['venusaur', ['2024-10-03', '2024-10-04']],
+    ['charmander', ['2024-10-01', '2024-10-03']],
+    ['charmeleon', ['2024-10-02', '2024-10-04']],
+    ['charizard', ['2024-10-01', '2024-10-03']],
+    ['squirtle', ['2024-10-02', '2024-10-03']],
+    ['wartortle', ['2024-10-03', '2024-10-04']],
+    ['blastoise', ['2024-10-01', '2024-10-02']],
+    ['pikachu', ['2024-10-01', '2024-10-04']],
+    ['jigglypuff', ['2024-10-02', '2024-10-03']],
+    ['eevee', ['2024-10-03', '2024-10-04']],
+    ['snorlax', ['2024-10-01', '2024-10-02']],
+    ['mewtwo', ['2024-10-03', '2024-10-04']]
+];
 
 let types = [
-    'grass',
-    'fire',
-    'water'
-]
+    'grass',  // Bulbasaur
+    'grass',  // Ivysaur
+    'grass',  // Venusaur
+    'fire',   // Charmander
+    'fire',   // Charmeleon
+    'fire',   // Charizard
+    'water',  // Squirtle
+    'water',  // Wartortle
+    'water',  // Blastoise
+    'electric', // Pikachu
+    'normal',  // Jigglypuff
+    'normal',  // Eevee
+    'normal',  // Snorlax
+    'psychic'  // Mewtwo
+];
 
-let names = [
-    'grass',
-    'water',
-    'fire'
-]
 
 //this url becomes https://pokeapi.co/api/v2/pokemon/bulbasaur
 let URL = `https://pokeapi.co/api/v2/pokemon/${pokemons[0]}`
 
-//names url
-let URLnames = `https://pokeapi.co/api/v2/type/${names[0]}`
+//names url not really needed but i'd like for this to stay here
+let URLnames = `https://pokeapi.co/api/v2/type/${types[0]}`
 
 axios.get(URL).then(res => {
     let pokemon = res.data;
-    // console.log(pokemon.types)
-    
-    // console.log(pokemon, 'im hererere')
+    // console.log(pokemon)
     //this gets the axios call to https://pokeapi.co/api/v2/pokemon/bulbasaur
 });
 
-names.map(elem => {
-    //just fixing up the types api call
+types.map(elem => {
     axios.get(`https://pokeapi.co/api/v2/type/${elem}`).then(res => {
         let type = res.data
-        console.log(type.name)
+        // console.log(type.name)
     })
 })
 
@@ -56,7 +87,7 @@ pokemons.map((element, index) => { //the element part goes for the elements in t
         //get the corresponding type along with the pokemon
         const correspondingType= types[index]
 
-        // console.log(`${pokemon.name} type: ${correspondingType}`)
+        console.log(`${pokemon.name} type: ${correspondingType}`)
     }); 
     
 })

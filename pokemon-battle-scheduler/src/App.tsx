@@ -179,3 +179,7 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+function setFilter(type: string): void {
+  throw new Error('Function not implemented.');
+}
