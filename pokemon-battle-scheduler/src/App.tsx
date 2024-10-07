@@ -166,7 +166,6 @@ const App: React.FC = () => {
   return (
     <Container>
       <Title>Pokémon Battle Scheduler</Title>
-      <BattleSchedule bestBattleDates={bestBattleDates} />
       <Grid>
   {pokemons.map((pokemon, index) => (
     <motion.div key={pokemon.name} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: index * 0.1 }}>
@@ -174,12 +173,14 @@ const App: React.FC = () => {
     </motion.div>
   ))}
 </Grid>
+    <BattleSchedule bestBattleDates={bestBattleDates} />
+
     </Container>
   );
 };
 
 export default App;
 
-function setFilter(type: string): void {
+function setFilter(_type: string): void {
   throw new Error('Function not implemented.');
 }

@@ -22,7 +22,8 @@ const Card = styled.div`
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
-
+  width: 240px; /* Fixed width */
+  height: 400px; /* Fixed height */
   &:hover {
     transform: translateY(-10px);
   }
