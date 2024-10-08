@@ -9,7 +9,7 @@ interface PokemonCardProps {
     types: string[];
     image: string;
   };
-  availability: string[];
+  // availability?: string[];
 }
 
 const Card = styled.div`
@@ -23,15 +23,16 @@ const Card = styled.div`
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
   width: 240px; /* Fixed width */
-  height: 400px; /* Fixed height */
+  height: 330px; /* Fixed height */
+  margin-bottom: 15px;
   &:hover {
     transform: translateY(-10px);
   }
 `;
 
 const PokemonImage = styled.img`
-  width: 96px;
-  height: 96px;
+  width: 156px;
+  height: 156px;
   image-rendering: pixelated;
   margin-bottom: 10px;
 `;
@@ -51,14 +52,7 @@ const TypeBadge = styled.span<{ color: string }>`
   margin: 0 5px;
 `;
 
-const AvailabilityList = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin-top: 15px;
-  font-size: 0.8em;
-`;
-
-const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, availability }) => {
+const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,11 +77,6 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon, availability }) => {
           </TypeBadge>
         ))}
       </div>
-      <AvailabilityList>
-        {availability.map((date) => (
-          <li key={date}>{date}</li>
-        ))}
-      </AvailabilityList>
     </Card>
   );
 };
