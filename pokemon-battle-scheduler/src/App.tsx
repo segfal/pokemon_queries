@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
@@ -30,24 +30,61 @@ const Grid = styled.div`
 
 const App: React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const loader = useRef(null);
+
+  const loadMorePokemons = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    const startIndex = (page - 1) * 20 + 1;
+    const endIndex = page * 20;
+    const newPokemonList: Pokemon[] = [];
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
+      const pokemon: Pokemon = {
+        name: res.data.name,
+        types: res.data.types.map((typeInfo: any) => typeInfo.type.name),
+        image: res.data.sprites.front_default,
+      };
+      newPokemonList.push(pokemon);
+    }
+
+    setPokemons(prevPokemons => [...prevPokemons, ...newPokemonList]);
+    setPage(prevPage => prevPage + 1);
+    setLoading(false);
+  }, [page, loading]);
 
   useEffect(() => {
-    const fetchPokemons = async () => {
-      const pokemonList: Pokemon[] = [];
-      for (let i = 1; i <= 20; i++) {
-        const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
-        const pokemon: Pokemon = {
-          name: res.data.name,
-          types: res.data.types.map((typeInfo: any) => typeInfo.type.name),
-          image: res.data.sprites.front_default,
-        };
-        pokemonList.push(pokemon);
-      }
-      setPokemons(pokemonList);
+    loadMorePokemons();
+  }, []);
+
+  useEffect(() => {
+    const options = {
+      root: null,
+      rootMargin: "20px",
+      threshold: 1.0
     };
 
-    fetchPokemons();
-  }, []);
+    const observer = new IntersectionObserver(handleObserver, options);
+    if (loader.current) {
+      observer.observe(loader.current);
+    }
+
+    return () => {
+      if (loader.current) {
+        observer.unobserve(loader.current);
+      }
+    };
+  }, [loadMorePokemons]);
+
+  const handleObserver = (entities: IntersectionObserverEntry[]) => {
+    const target = entities[0];
+    if (target.isIntersecting) {
+      loadMorePokemons();
+    }
+  };
 
   return (
     <Container>
@@ -55,7 +92,7 @@ const App: React.FC = () => {
       <Grid>
         {pokemons.map((pokemon, index) => (
           <motion.div
-            key={pokemon.name}
+            key={`${pokemon.name}-${index}`}
             layout
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -65,6 +102,9 @@ const App: React.FC = () => {
           </motion.div>
         ))}
       </Grid>
+      <div ref={loader}>
+        {loading && <p>Loading more Pokémon...</p>}
+      </div>
     </Container>
   );
 };
