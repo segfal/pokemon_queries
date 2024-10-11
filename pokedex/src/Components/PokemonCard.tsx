@@ -9,7 +9,6 @@ interface PokemonCardProps {
     types: string[];
     image: string;
   };
-  // availability?: string[];
 }
 
 const Card = styled.div`
