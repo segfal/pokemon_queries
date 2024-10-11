@@ -25,7 +25,8 @@ const Title = styled.h1`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(6, 1fr); 
+  grid-template-columns: repeat(5, 1fr); 
+  justify-items: center;
 `;
 
 const SearchInput = styled.input`
