@@ -28,11 +28,23 @@ const Grid = styled.div`
   grid-template-columns: repeat(6, 1fr); 
 `;
 
+const SearchInput = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin: 50px 0;
+  font-size: 1.2em;
+  border: 2px solid #3b4cca;
+  border-radius: 5px;
+`;
+
+
 const App: React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const loader = useRef(null);
+
 
   const loadMorePokemons = useCallback(async () => {
     if (loading) return;
@@ -83,14 +95,28 @@ const App: React.FC = () => {
     const target = entities[0];
     if (target.isIntersecting) {
       loadMorePokemons();
-    }
+    }  
   };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
+
+  const filteredPokemons = pokemons.filter(pokemon =>
+    pokemon.name.toLowerCase().startsWith(searchQuery)
+  );
 
   return (
     <Container>
       <Title>Pokémon Pokédex</Title>
+      <SearchInput
+        type="text"
+        placeholder="Search Pokémon..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+      />
       <Grid>
-        {pokemons.map((pokemon, index) => (
+        {filteredPokemons.map((pokemon, index) => (
           <motion.div
             key={`${pokemon.name}-${index}`}
             layout
