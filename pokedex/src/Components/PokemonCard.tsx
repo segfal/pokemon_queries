@@ -24,6 +24,11 @@ const Card = styled.div`
   width: 240px; /* Fixed width */
   height: 330px; /* Fixed height */
   margin-bottom: 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Horizontally center */
+  
   &:hover {
     transform: translateY(-10px);
   }
@@ -48,7 +53,7 @@ const TypeBadge = styled.span<{ color: string }>`
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 0.8em;
-  margin: 0 5px;
+  margin: 0 2px;
 `;
 
 const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
@@ -60,7 +65,24 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
 
   const getTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
-      // Color mapping as before
+      bug: '#A8B820',
+      dark: '#705848',
+      dragon: '#6F35FC',
+      electric: '#F8D030',
+      fairy: '#EE99AC',
+      fighting: '#C03028',
+      fire: '#F08030',
+      flying: '#A98FF3',
+      ghost: '#705898',
+      grass: '#78C850',
+      ground: '#E0C068',
+      ice: '#98D8D8',
+      normal: '#A8A878',
+      poison: '#A040A0',
+      psychic: '#F85888',
+      rock: '#B8A038',
+      steel: '#B8B8D0',
+      water: '#6890F0',
     };
     return colors[type] || '#68A090';
   };
