@@ -126,8 +126,8 @@ const HomePage: React.FC = () => {
   );
 
 
-  const handleClick = (pokemonName: string) => {
-     navigate(`/${pokemonName}`);
+  const handleClick = (pokemonName: string, pokemon: Pokemon) => {
+     navigate(`/${pokemonName}`, { state: { pokemon } });
    };
 
   return (
@@ -147,7 +147,7 @@ const HomePage: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.1 }}
-            onClick={() => handleClick(pokemon.name)}    
+            onClick={() => handleClick(pokemon.name, pokemon)}    
           >
             <PokemonCard pokemon={pokemon}
             />
