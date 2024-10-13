@@ -29,6 +29,21 @@ const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr); 
   justify-items: center;
+
+  @media (max-width: 1280px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+      justify-items: center;
+
+  }
+  @media (max-width: 500px) {
+    grid-template-columns: repeat(1, 1fr);
+    justify-items: center;
+ }
+
 `;
 
 const SearchInput = styled.input`
