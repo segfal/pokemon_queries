@@ -56,6 +56,28 @@ const SearchInput = styled.input`
 `;
 
 
+const LoadMoreButton = styled.button`
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-size: 1.2em;
+  background-color: #3b4cca;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #2a3a99;
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+`;
+
 const HomePage: React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -149,14 +171,13 @@ const HomePage: React.FC = () => {
             transition={{ delay: index * 0.1 }}
             onClick={() => handleClick(pokemon.name, pokemon)}    
           >
-            <PokemonCard pokemon={pokemon}
-            />
+            <PokemonCard pokemon={pokemon} />
           </motion.div>
         ))}
       </Grid>
-      <div ref={loader}>
-        {loading && <p>Loading more Pokémon...</p>}
-      </div>
+      <LoadMoreButton onClick={loadMorePokemons} disabled={loading}>
+        {loading ? 'Loading...' : 'Load More'}
+      </LoadMoreButton>
     </Container>
   );
 };
