@@ -12,12 +12,6 @@ interface Pokemon {
   image: string;
 }
 
-
-interface SearchPokemonProps {
-  searchQuery: string;
-}
-
-
 const Container = styled.div`
   padding: 20px;
   margin-bottom: 20px;
