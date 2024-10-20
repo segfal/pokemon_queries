@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import PokemonCard from '../Components/PokemonCard';
 import { useNavigate } from 'react-router-dom';
+import { fetchAllPokemon, searchPokemon, getPokemonBatch } from '../utils/searchQuery';
 
 
 interface Pokemon {
@@ -11,6 +11,12 @@ interface Pokemon {
   types: string[];
   image: string;
 }
+
+
+interface SearchPokemonProps {
+  searchQuery: string;
+}
+
 
 const Container = styled.div`
   padding: 20px;
@@ -81,76 +87,56 @@ const LoadMoreButton = styled.button`
 const HomePage: React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const loader = useRef(null);
-  
+  const [currentBatch, setCurrentBatch] = useState(0);
+  const batchSize = 20;
   const navigate = useNavigate();
 
-  const loadMorePokemons = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
-    const startIndex = (page - 1) * 20 + 1;
-    const endIndex = page * 20;
-    const newPokemonList: Pokemon[] = [];
-
-    for (let i = startIndex; i <= endIndex; i++) {
-      const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
-      const pokemon: Pokemon = {
-        name: res.data.name,
-        types: res.data.types.map((typeInfo: any) => typeInfo.type.name),
-        image: res.data.sprites.front_default,
-      };
-      newPokemonList.push(pokemon);
-    } 
-
-    setPokemons(prevPokemons => [...prevPokemons, ...newPokemonList]);
-    setPage(prevPage => prevPage + 1);
-    setLoading(false);
-  }, [page, loading]);
-
   useEffect(() => {
-    loadMorePokemons();
+    const initializePokemon = async () => {
+      setLoading(true);
+      await fetchAllPokemon();
+      const initialBatch = getPokemonBatch(0, batchSize);
+      setPokemons(initialBatch);
+      setCurrentBatch(1);
+      setLoading(false);
+    };
+
+    initializePokemon();
   }, []);
 
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0
-    };
-
-    const observer = new IntersectionObserver(handleObserver, options);
-    if (loader.current) {
-      observer.observe(loader.current);
-    }
-
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
-      }
-    };
-  }, [loadMorePokemons]);
-
-  const handleObserver = (entities: IntersectionObserverEntry[]) => {
-    const target = entities[0];
-    if (target.isIntersecting) {
-      loadMorePokemons();
-    }  
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value.toLowerCase());
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    if (query) {
+      const searchResults = searchPokemon(query);
+      setPokemons(searchResults);
+    } else {
+      const initialBatch = getPokemonBatch(0, batchSize);
+      setPokemons(initialBatch);
+      setCurrentBatch(1);
+    }
   };
 
-  const filteredPokemons = pokemons.filter(pokemon =>
-    pokemon.name.toLowerCase().startsWith(searchQuery)
-  );
-
+  const loadMorePokemons = useCallback(() => {
+    if (loading) return;
+    setLoading(true);
+    
+    if (searchQuery) {
+      const searchResults = searchPokemon(searchQuery);
+      setPokemons(prevPokemons => [...prevPokemons, ...searchResults.slice(prevPokemons.length, prevPokemons.length + batchSize)]);
+    } else {
+      const nextBatch = getPokemonBatch(currentBatch * batchSize, batchSize);
+      setPokemons(prevPokemons => [...prevPokemons, ...nextBatch]);
+      setCurrentBatch(prevBatch => prevBatch + 1);
+    }
+    setLoading(false);
+  }, [searchQuery, loading, currentBatch]);
 
   const handleClick = (pokemonName: string, pokemon: Pokemon) => {
-     navigate(`/${pokemonName}`, { state: { pokemon } });
-   };
+    navigate(`/${pokemonName}`, { state: { pokemon } });
+  };
 
   return (
     <Container>
@@ -162,7 +148,7 @@ const HomePage: React.FC = () => {
         onChange={handleSearchChange}
       />
       <Grid>
-        {filteredPokemons.map((pokemon, index) => (
+        {pokemons.map((pokemon, index) => (
           <motion.div
             key={`${pokemon.name}-${index}`}
             layout
