@@ -10,6 +10,7 @@ pokemons = [
     "squirtle",
     "wartortle",
     "blastoise",
+    "caterpie",
 ];
 
 pokemons.map((pokemon) => {
