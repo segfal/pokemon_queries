@@ -1,35 +1,64 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import PokemonCard from '../Components/PokemonCard'; // Import the PokemonCard component
+import axios from 'axios';
 
 const UniqueCards: React.FC = () => {
     const location = useLocation();
     const pokemon = location.state?.pokemon; // Get pokemon from the state
 
+    const [pokemonData, setPokemonData] = useState<any>(null);
+    const [pokemonDescription, setPokemonDescription] = useState<string>('');
+
+    useEffect(() => {
+        const fetchPokemonData = async () => {
+            try {
+                // Fetch basic Pokemon data
+                const pokemonResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+                setPokemonData(pokemonResponse.data);
+
+                // Fetch Pokemon species data for the description
+                const speciesResponse = await axios.get(pokemonResponse.data.species.url);
+                const englishFlavorText = speciesResponse.data.flavor_text_entries.find(
+                    (entry: any) => entry.language.name === 'en'
+                );
+                if (englishFlavorText) {
+                    setPokemonDescription(englishFlavorText.flavor_text);
+                }
+
+            } catch (error) {
+                console.error("Error fetching Pokemon data:", error);
+            }
+        };
+
+        fetchPokemonData();
+    }, [pokemon.name])
+
     const PTag = styled.p`
         text-align: center;
-        color: #ffcb05; // Text fill color
+        color: #ffcb05;
         font-size: 40px;
-        font-weight: bold; // Add boldness if needed to match the Figma design
+        font-weight: bold;
         text-shadow: 2px 2px #3b4cca;
     `;
 
     const GridContainer = styled.div`
         display: grid;
-        grid-template-columns: 1fr 1.8fr;  // Two columns: left and right
-        gap: 20px;
+        grid-template-columns: 1fr 1.8fr;
+        gap: 40px;
         justify-content: center;
         align-items: center;
-        height: 70vh;  // Fill the height of the screen
-        color: #ffcb05; // Text fill color
+        height: 70vh;
+        color: #ffcb05;
         text-shadow: 1px 1px #3b4cca;
-        font-size: 1.2em;
+        font-size: 1.3em;
 
     `;
 
     const CardContainer = styled.div`
         transform: translate(100px, 10px);
+        width: 309px;
     `;
 
     const StatsContainer = styled.div`
@@ -37,12 +66,12 @@ const UniqueCards: React.FC = () => {
         grid-template-columns: 1fr 1fr;
         grid-auto-rows: auto;
         padding: 10px;
-        background-color: rgba(0, 0, 0, 0.2); 
+        background-color: rgba(0, 0, 0, 0.5); 
         border: solid 1px black;
         border-radius: 2px;
         box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.1);        
         transform: translate(-130px);
-        font-size: 10px;
+        font-size: 11px;
         text-shadow: 2px 2px #3b4cca;
     `;
 
@@ -53,20 +82,21 @@ const UniqueCards: React.FC = () => {
         text-shadow: 2px 2px #3b4cca;
 
     `
-    const WeaknessesBox = styled.div`
+    const AbilitiesBox = styled.div`
         border-bottom: solid 1px white;
         border-left: solid 1px white;
         padding: 10px;
-        font-size: 1.2em;
+        font-size: 1.3em;
         text-shadow: 2px 2px #3b4cca;
+        line-height: 1.6; 
 
 
     `
-    const AbilitiesBox = styled.div`
-        border-right: solid 1px white;
+    const DescriptionBox = styled.div`
         font-size: 1.2em;
         padding: 10px;
         text-shadow: 2px 2px #3b4cca;
+        line-height: 1.6; 
 
 
     `
@@ -74,6 +104,7 @@ const UniqueCards: React.FC = () => {
         padding: 10px;
         font-size: 1.2em;
         text-shadow: 2px 2px #3b4cca;
+        border-right: solid 1px;
 
 
     `
@@ -83,10 +114,8 @@ const UniqueCards: React.FC = () => {
     return (
         <>
             <PTag>Pokemon stats</PTag>
-            {/* Left side - Pokémon map (image and type) */}
             <GridContainer>
                 <CardContainer>
-                    {/* <p>{pokemonName}</p> */}
                     {pokemon && (
                         <>
                             <PokemonCard pokemon={pokemon} />
@@ -94,50 +123,51 @@ const UniqueCards: React.FC = () => {
                     )}
                 </CardContainer>
 
-                {/* Right side - Pokémon stats */}
                 <StatsContainer>
                     <StatsBox>
                         <h1>Base Stats</h1>
                         <BoxChildren>
-                            <p>HP: 100</p>
-                            <p>Attack: 80</p>
-                            <p>Special Attack: 90</p>
-                            <p>Defense: 70</p>
-                            <p>Special Defense: 85</p>
-                            <p>Speed: 100</p>
-                            <p>Total: 525</p>
+                            {pokemonData && pokemonData.stats.map((stat: any) => (
+                                <p key={stat.stat.name}> {stat.stat.name.toUpperCase()}: {stat.base_stat} </p>
+                            ))}
+                            {pokemonData && (
+                                <p>TOTAL: {pokemonData.stats.reduce((sum: number, stat: any) => sum + stat.base_stat, 0)}</p>
+                            )}
                         </BoxChildren>
                     </StatsBox>
 
-                    {/* Upper-right: Weaknesses */}
-                    <WeaknessesBox>
-                        <h2>Weaknesses</h2>
-                        <BoxChildren>
-                            <p>Fire</p>
-                            <p>Ice</p>
-                            <p>Flying</p>
-                            <p>Bug</p>
-                        </BoxChildren>
-                    </WeaknessesBox>
-
-                    {/* Lower-left: Abilities */}
                     <AbilitiesBox>
-
                         <h2>Abilities</h2>
                         <BoxChildren>
-                            <p>Overgrow</p>
-                            <p>Chlorophyll (Hidden Ability)</p>
+                            {pokemonData && pokemonData.abilities.map((ability: any) => (
+                                <p key={ability.ability.name}>
+                                    {ability.ability.name.toUpperCase()} {ability.is_hidden ? "(Hidden Ability)" : ""}
+                                </p>
+                            ))}
                         </BoxChildren>
-
                     </AbilitiesBox>
 
-                    {/* Lower-right: General Facts */}
                     <GeneralFactsBox>
                         <h2>General Facts</h2>
                         <BoxChildren>
-                            <p>This Pokémon prefers sunny weather and often resides in forests.</p>
+                            {pokemonData && (
+                                <>
+                                    <p>HEIGHT: {pokemonData.height / 10} M</p>
+                                    <p>WEIGHT: {pokemonData.weight / 10} KG</p>
+                                    <p>BASE EXPERIENCE: {pokemonData.base_experience}</p>
+                                </>
+                            )}
                         </BoxChildren>
                     </GeneralFactsBox>
+
+                    <DescriptionBox>
+                        <h2>Description</h2>
+                        <BoxChildren>
+                            <p>{pokemonDescription.toUpperCase()}</p>
+                        </BoxChildren>
+                    </DescriptionBox>
+
+
                 </StatsContainer>
             </GridContainer>
         </>

@@ -21,13 +21,13 @@ const Card = styled.div`
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease-in-out;
-  width: 240px; /* Fixed width */
-  height: 330px; /* Fixed height */
+  min-width: 260px;
+  height: 330px;
   margin-bottom: 15px;
 
   display: flex;
   flex-direction: column;
-  align-items: center; /* Horizontally center */
+  align-items: center;
   
   &:hover {
     transform: translateY(-10px);
@@ -38,7 +38,6 @@ const PokemonImage = styled.img`
   width: 156px;
   height: 156px;
   image-rendering: pixelated;
-  margin-bottom: 10px;
 `;
 
 const PokemonName = styled.h2`
