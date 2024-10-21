@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import PokemonCard from '../Components/PokemonCard';
 import { useNavigate } from 'react-router-dom';
+import { fetchAllPokemon, searchPokemon, getPokemonBatch } from '../utils/searchQuery';
 
 
 interface Pokemon {
@@ -81,11 +81,11 @@ const LoadMoreButton = styled.button`
 const HomePage: React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
-  const loader = useRef(null);
-  
+  const [currentBatch, setCurrentBatch] = useState(0);
+  const batchSize = 20;
   const navigate = useNavigate();
+
 
   const loadMorePokemons = useCallback(async () => {
     if (loading) return;
@@ -111,47 +111,52 @@ const HomePage: React.FC = () => {
   }, [page, loading]);
 
   useEffect(() => {
-    loadMorePokemons();
+    const initializePokemon = async () => {
+      setLoading(true);
+      await fetchAllPokemon();
+      const initialBatch = getPokemonBatch(0, batchSize);
+      setPokemons(initialBatch);
+      setCurrentBatch(1);
+      setLoading(false);
+    };
+
+    initializePokemon();
   }, []);
 
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0
-    };
-
-    const observer = new IntersectionObserver(handleObserver, options);
-    if (loader.current) {
-      observer.observe(loader.current);
-    }
-
-    return () => {
-      if (loader.current) {
-        observer.unobserve(loader.current);
-      }
-    };
-  }, [loadMorePokemons]);
-
-  const handleObserver = (entities: IntersectionObserverEntry[]) => {
-    const target = entities[0];
-    if (target.isIntersecting) {
-      loadMorePokemons();
-    }  
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value.toLowerCase());
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+
+    if (query) {
+      const searchResults = searchPokemon(query);
+      setPokemons(searchResults);
+    } else {
+      const initialBatch = getPokemonBatch(0, batchSize);
+      setPokemons(initialBatch);
+      setCurrentBatch(1);
+    }
   };
 
-  const filteredPokemons = pokemons.filter(pokemon =>
-    pokemon.name.toLowerCase().startsWith(searchQuery)
-  );
-
+  const loadMorePokemons = useCallback(() => {
+    if (loading) return;
+    setLoading(true);
+    
+    if (searchQuery) {
+      const searchResults = searchPokemon(searchQuery);
+      setPokemons(prevPokemons => [...prevPokemons, ...searchResults.slice(prevPokemons.length, prevPokemons.length + batchSize)]);
+    } else {
+      const nextBatch = getPokemonBatch(currentBatch * batchSize, batchSize);
+      setPokemons(prevPokemons => [...prevPokemons, ...nextBatch]);
+      setCurrentBatch(prevBatch => prevBatch + 1);
+    }
+    setLoading(false);
+  }, [searchQuery, loading, currentBatch]);
 
   const handleClick = (pokemonName: string, pokemon: Pokemon) => {
+
     navigate(`/${pokemonName}`, { state: { pokemon, id: pokemon.id } });
    };
+
 
   return (
     <>
@@ -164,7 +169,7 @@ const HomePage: React.FC = () => {
         onChange={handleSearchChange}
       />
       <Grid>
-        {filteredPokemons.map((pokemon, index) => (
+        {pokemons.map((pokemon, index) => (
           <motion.div
             key={`${pokemon.name}-${index}`}
             layout
