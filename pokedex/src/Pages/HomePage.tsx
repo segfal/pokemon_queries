@@ -10,6 +10,7 @@ interface Pokemon {
   name: string;
   types: string[];
   image: string;
+  id: number;
 }
 
 const Container = styled.div`
@@ -19,8 +20,7 @@ const Container = styled.div`
 
 const Title = styled.h1`
   text-align: center;
-  margin: 20px 0;
-  font-size: 2em;
+  margin: 30px 0 20px 0; 
   color: #ffcb05;
   text-shadow: 2px 2px #3b4cca;
 `;
@@ -86,6 +86,30 @@ const HomePage: React.FC = () => {
   const batchSize = 20;
   const navigate = useNavigate();
 
+
+  const loadMorePokemons = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    const startIndex = (page - 1) * 20 + 1;
+    const endIndex = page * 20;
+    const newPokemonList: Pokemon[] = [];
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
+      const pokemon: Pokemon = {
+        name: res.data.name,
+        types: res.data.types.map((typeInfo: any) => typeInfo.type.name),
+        image: res.data.sprites.front_default,
+        id: res.data.id,
+      };
+      newPokemonList.push(pokemon);
+    } 
+
+    setPokemons(prevPokemons => [...prevPokemons, ...newPokemonList]);
+    setPage(prevPage => prevPage + 1);
+    setLoading(false);
+  }, [page, loading]);
+
   useEffect(() => {
     const initializePokemon = async () => {
       setLoading(true);
@@ -129,10 +153,13 @@ const HomePage: React.FC = () => {
   }, [searchQuery, loading, currentBatch]);
 
   const handleClick = (pokemonName: string, pokemon: Pokemon) => {
-    navigate(`/${pokemonName}`, { state: { pokemon } });
-  };
+
+    navigate(`/${pokemonName}`, { state: { pokemon, id: pokemon.id } });
+   };
+
 
   return (
+    <>
     <Container>
       <Title>Pokémon Pokédex</Title>
       <SearchInput
@@ -159,6 +186,7 @@ const HomePage: React.FC = () => {
         {loading ? 'Loading...' : 'Load More'}
       </LoadMoreButton>
     </Container>
+    </>
   );
 };
 
