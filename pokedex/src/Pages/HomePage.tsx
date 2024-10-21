@@ -3,15 +3,16 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import PokemonCard from '../Components/PokemonCard';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { fetchAllPokemon, searchPokemon, getPokemonBatch } from '../utils/searchQuery';
-
 
 interface Pokemon {
   name: string;
   types: string[];
   image: string;
-  id: number;
 }
+
+
 
 const Container = styled.div`
   padding: 20px;
@@ -20,14 +21,14 @@ const Container = styled.div`
 
 const Title = styled.h1`
   text-align: center;
-  margin: 30px 0 20px 0; 
+  margin: 30px 0 20px 0;
   color: #ffcb05;
   text-shadow: 2px 2px #3b4cca;
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
+  grid-template-columns: repeat(5, 1fr);
   justify-items: center;
 
   @media (max-width: 1280px) {
@@ -35,15 +36,14 @@ const Grid = styled.div`
   }
 
   @media (max-width: 900px) {
-      grid-template-columns: repeat(2, 1fr);
-      justify-items: center;
-
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
   }
+
   @media (max-width: 500px) {
     grid-template-columns: repeat(1, 1fr);
     justify-items: center;
- }
-
+  }
 `;
 
 const SearchInput = styled.input`
@@ -54,7 +54,6 @@ const SearchInput = styled.input`
   border: 2px solid #3b4cca;
   border-radius: 5px;
 `;
-
 
 const LoadMoreButton = styled.button`
   display: block;
@@ -86,29 +85,41 @@ const HomePage: React.FC = () => {
   const batchSize = 20;
   const navigate = useNavigate();
 
-
   const loadMorePokemons = useCallback(async () => {
     if (loading) return;
     setLoading(true);
-    const startIndex = (page - 1) * 20 + 1;
-    const endIndex = page * 20;
-    const newPokemonList: Pokemon[] = [];
 
-    for (let i = startIndex; i <= endIndex; i++) {
-      const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
-      const pokemon: Pokemon = {
-        name: res.data.name,
-        types: res.data.types.map((typeInfo: any) => typeInfo.type.name),
-        image: res.data.sprites.front_default,
-        id: res.data.id,
-      };
-      newPokemonList.push(pokemon);
-    } 
+    if (searchQuery) {
+      const searchResults = searchPokemon(searchQuery);
+      setPokemons((prevPokemons) => [
+        ...prevPokemons,
+        ...searchResults.slice(prevPokemons.length, prevPokemons.length + batchSize),
+      ]);
+    } else {
+      const startIndex = currentBatch * batchSize + 1;
+      const endIndex = startIndex + batchSize - 1;
+      const newPokemonList: Pokemon[] = [];
 
-    setPokemons(prevPokemons => [...prevPokemons, ...newPokemonList]);
-    setPage(prevPage => prevPage + 1);
+      for (let i = startIndex; i <= endIndex; i++) {
+        try {
+          const res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`);
+          const pokemon: Pokemon = {
+            name: res.data.name,
+            types: res.data.types.map((typeInfo: any) => typeInfo.type.name),
+            image: res.data.sprites.front_default,
+          };
+          newPokemonList.push(pokemon);
+        } catch (error) {
+          console.error(`Error fetching Pokémon with ID: ${i}`, error);
+        }
+      }
+
+      setPokemons((prevPokemons) => [...prevPokemons, ...newPokemonList]);
+      setCurrentBatch((prevBatch) => prevBatch + 1);
+    }
+
     setLoading(false);
-  }, [page, loading]);
+  }, [searchQuery, loading, currentBatch]);
 
   useEffect(() => {
     const initializePokemon = async () => {
@@ -137,29 +148,11 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const loadMorePokemons = useCallback(() => {
-    if (loading) return;
-    setLoading(true);
-    
-    if (searchQuery) {
-      const searchResults = searchPokemon(searchQuery);
-      setPokemons(prevPokemons => [...prevPokemons, ...searchResults.slice(prevPokemons.length, prevPokemons.length + batchSize)]);
-    } else {
-      const nextBatch = getPokemonBatch(currentBatch * batchSize, batchSize);
-      setPokemons(prevPokemons => [...prevPokemons, ...nextBatch]);
-      setCurrentBatch(prevBatch => prevBatch + 1);
-    }
-    setLoading(false);
-  }, [searchQuery, loading, currentBatch]);
-
   const handleClick = (pokemonName: string, pokemon: Pokemon) => {
-
-    navigate(`/${pokemonName}`, { state: { pokemon, id: pokemon.id } });
-   };
-
+    navigate(`/${pokemonName}`, { state: { pokemon } });
+  };
 
   return (
-    <>
     <Container>
       <Title>Pokémon Pokédex</Title>
       <SearchInput
@@ -176,7 +169,7 @@ const HomePage: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.1 }}
-            onClick={() => handleClick(pokemon.name, pokemon)}    
+            onClick={() => handleClick(pokemon.name, pokemon)}
           >
             <PokemonCard pokemon={pokemon} />
           </motion.div>
@@ -186,7 +179,6 @@ const HomePage: React.FC = () => {
         {loading ? 'Loading...' : 'Load More'}
       </LoadMoreButton>
     </Container>
-    </>
   );
 };
 
