@@ -49,7 +49,7 @@ const UniqueCards: React.FC = () => {
         text-shadow: 2px 2px #3b4cca;
     `;
 
-    const GridContainer = styled.div`
+    const GridContainer = styled.section`
         display: grid;
         grid-template-columns: 1fr 1.8fr;
         gap: 40px;
@@ -62,12 +62,12 @@ const UniqueCards: React.FC = () => {
 
     `;
 
-    const CardContainer = styled.div`
+    const CardContainer = styled.article`
         transform: translate(100px, 10px);
         width: 309px;
     `;
 
-    const StatsContainer = styled.div`
+    const StatsContainer = styled.section`
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-auto-rows: auto;
@@ -81,14 +81,14 @@ const UniqueCards: React.FC = () => {
         text-shadow: 2px 2px #3b4cca;
     `;
 
-    const StatsBox = styled.div`
+    const StatsBox = styled.section`
         border-bottom: solid 1px white;
         padding: 10px;
         font-size: 1.2em;
         text-shadow: 2px 2px #3b4cca;
 
     `
-    const AbilitiesBox = styled.div`
+    const AbilitiesBox = styled.section`
         border-bottom: solid 1px white;
         border-left: solid 1px white;
         padding: 10px;
@@ -98,7 +98,7 @@ const UniqueCards: React.FC = () => {
 
 
     `
-    const DescriptionBox = styled.div`
+    const DescriptionBox = styled.section`
         font-size: 1.2em;
         padding: 10px;
         text-shadow: 2px 2px #3b4cca;
@@ -106,7 +106,7 @@ const UniqueCards: React.FC = () => {
 
 
     `
-    const GeneralFactsBox = styled.div`
+    const GeneralFactsBox = styled.section`
         padding: 10px;
         font-size: 1.2em;
         text-shadow: 2px 2px #3b4cca;
@@ -118,7 +118,7 @@ const UniqueCards: React.FC = () => {
         color: white;
     `;
 
-    const EvolutionContainer = styled.div`
+    const EvolutionContainer = styled.section`
         grid-column: 1 / -1;
         width: 100%;
         padding: 20px;

@@ -11,7 +11,7 @@ interface PokemonCardProps {
   };
 }
 
-const Card = styled.div`
+const Card = styled.article`
   background: rgba(0, 0, 0, 0.8);
   border: 3px solid #ffffff;
   border-radius: 10px;
@@ -45,6 +45,12 @@ const PokemonName = styled.h2`
   color: #ffcb05;
   text-shadow: 1px 1px #3b4cca;
 `;
+
+const MapList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+`
 
 const TypeBadge = styled.span<{ color: string }>`
   background-color: ${({ color }) => color};
@@ -90,13 +96,13 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ pokemon }) => {
     <Card ref={cardRef}>
       <PokemonImage src={pokemon.image} alt={pokemon.name} />
       <PokemonName>{pokemon.name.toUpperCase()}</PokemonName>
-      <div>
+      <MapList>
         {pokemon.types.map((type) => (
           <TypeBadge key={type} color={getTypeColor(type)}>
             {type.toUpperCase()}
           </TypeBadge>
         ))}
-      </div>
+      </MapList>
     </Card>
   );
 };
