@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import PokemonCard from '../Components/PokemonCard'; // Import the PokemonCard component
 import axios from 'axios';
+import EvolutionChain from '../Components/EvolutionChain';
 
 const UniqueCards: React.FC = () => {
     const location = useLocation();
@@ -10,6 +11,7 @@ const UniqueCards: React.FC = () => {
 
     const [pokemonData, setPokemonData] = useState<any>(null);
     const [pokemonDescription, setPokemonDescription] = useState<string>('');
+    const [evolutionChain, setEvolutionChain] = useState<any>(null);
 
     useEffect(() => {
         const fetchPokemonData = async () => {
@@ -18,7 +20,7 @@ const UniqueCards: React.FC = () => {
                 const pokemonResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
                 setPokemonData(pokemonResponse.data);
 
-                // Fetch Pokemon species data for the description
+                // Fetch Pokemon species data for the description and evolution chain
                 const speciesResponse = await axios.get(pokemonResponse.data.species.url);
                 const englishFlavorText = speciesResponse.data.flavor_text_entries.find(
                     (entry: any) => entry.language.name === 'en'
@@ -26,6 +28,10 @@ const UniqueCards: React.FC = () => {
                 if (englishFlavorText) {
                     setPokemonDescription(englishFlavorText.flavor_text);
                 }
+
+                // Fetch evolution chain data
+                const evolutionChainResponse = await axios.get(speciesResponse.data.evolution_chain.url);
+                setEvolutionChain(evolutionChainResponse.data.chain);
 
             } catch (error) {
                 console.error("Error fetching Pokemon data:", error);
@@ -110,7 +116,25 @@ const UniqueCards: React.FC = () => {
     `
     const BoxChildren = styled.div`
         color: white;
-    `
+    `;
+
+    const EvolutionContainer = styled.div`
+        grid-column: 1 / -1;
+        width: 100%;
+        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border: solid 1px black;
+        border-radius: 2px;
+        box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.1);
+    `;
+
+    const EvolutionTitle = styled.h2`
+        color: #ffcb05;
+        text-shadow: 2px 2px #3b4cca;
+        text-align: center;
+        margin-bottom: 20px;
+    `;
+
     return (
         <>
             <PTag>Pokemon stats</PTag>
@@ -167,7 +191,12 @@ const UniqueCards: React.FC = () => {
                         </BoxChildren>
                     </DescriptionBox>
 
-
+                    <EvolutionContainer>
+                        <EvolutionTitle>Evolution Chain</EvolutionTitle>
+                        {evolutionChain && (
+                            <EvolutionChain chain={evolutionChain} />
+                        )}
+                    </EvolutionContainer>
                 </StatsContainer>
             </GridContainer>
         </>
