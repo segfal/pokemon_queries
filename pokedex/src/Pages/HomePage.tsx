@@ -14,7 +14,7 @@ interface Pokemon {
 
 
 
-const Container = styled.div`
+const Container = styled.main`
   padding: 20px;
   margin-bottom: 20px;
 `;
@@ -26,7 +26,7 @@ const Title = styled.h1`
   text-shadow: 2px 2px #3b4cca;
 `;
 
-const Grid = styled.div`
+const Grid = styled.section`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   justify-items: center;

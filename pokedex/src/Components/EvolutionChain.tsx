@@ -11,7 +11,7 @@ interface PokemonEvolution {
     image: string;
 }
 
-const ChainContainer = styled.div`
+const ChainContainer = styled.section`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,7 +19,7 @@ const ChainContainer = styled.div`
     gap: 20px;
 `;
 
-const EvolutionStep = styled.div`
+const EvolutionStep = styled.figure`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -30,7 +30,7 @@ const PokemonImage = styled.img`
     height: 100px;
 `;
 
-const PokemonName = styled.p`
+const PokemonName = styled.figcaption`
     color: #ffcb05;
     text-shadow: 1px 1px #3b4cca;
     text-align: center;

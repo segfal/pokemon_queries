@@ -1,7 +1,7 @@
 import pokelogo from '../assets/pokelogo.webp'
 import styled from 'styled-components';
 
-const Navbar = styled.div`
+const Navbar = styled.nav`
   top: 0;
   left: 0;
   width: 100%;
