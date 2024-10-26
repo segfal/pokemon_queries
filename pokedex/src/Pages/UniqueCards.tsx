@@ -60,11 +60,24 @@ const UniqueCards: React.FC = () => {
         text-shadow: 1px 1px #3b4cca;
         font-size: 1.3em;
 
+        @media (max-width: 1458px){
+            grid-template-columns: 2fr;
+            padding: 5px;
+
+        }
+        @media (max-width: 480px) {
+            box-shadow: 1px 1px 5px 5px rgba(0, 0, 0, 0.1);
+        }
     `;
 
     const CardContainer = styled.article`
         transform: translate(100px, 10px);
         width: 309px;
+
+        @media (max-width: 1460px){
+            margin: auto;
+            transform: translateX(-15px); 
+        }
     `;
 
     const StatsContainer = styled.section`
@@ -75,10 +88,17 @@ const UniqueCards: React.FC = () => {
         background-color: rgba(0, 0, 0, 0.5); 
         border: solid 1px black;
         border-radius: 2px;
-        box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.1);        
+        box-shadow: 2px 2px 10px 10px rgba(0, 0, 0, 0.1);  
         transform: translate(-130px);
         font-size: 11px;
         text-shadow: 2px 2px #3b4cca;
+       
+        @media (max-width: 1460px){
+            transform: translate(0);
+        }
+
+
+
     `;
 
     const StatsBox = styled.section`
@@ -111,8 +131,6 @@ const UniqueCards: React.FC = () => {
         font-size: 1.2em;
         text-shadow: 2px 2px #3b4cca;
         border-right: solid 1px;
-
-
     `
     const BoxChildren = styled.div`
         color: white;
@@ -165,7 +183,7 @@ const UniqueCards: React.FC = () => {
                         <BoxChildren>
                             {pokemonData && pokemonData.abilities.map((ability: any) => (
                                 <p key={ability.ability.name}>
-                                    {ability.ability.name.toUpperCase()} {ability.is_hidden ? "(Hidden Ability)" : ""}
+                                    {ability.ability.name.toUpperCase()}, {ability.is_hidden ? "(Hidden Ability)" : ""}
                                 </p>
                             ))}
                         </BoxChildren>
