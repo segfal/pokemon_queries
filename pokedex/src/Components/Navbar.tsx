@@ -1,5 +1,6 @@
 import pokelogo from '../assets/pokelogo.webp'
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
 const Navbar = styled.nav`
   top: 0;
@@ -22,7 +23,9 @@ const Navigation: React.FC = () => {
 
     return (
         <Navbar>
-            <Logo src={pokelogo} alt="Pokémon Logo" />
+            <Link to="/">
+                <Logo src={pokelogo} alt="Pokémon Logo" />
+            </Link>
         </Navbar>
     )
 }
