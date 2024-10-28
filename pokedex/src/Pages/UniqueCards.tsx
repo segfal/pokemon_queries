@@ -96,9 +96,10 @@ const UniqueCards: React.FC = () => {
         @media (max-width: 1460px){
             transform: translate(0);
         }
-
-
-
+        @media (max-width: 480px){
+            display: block;
+            padding: 30px;
+        }
     `;
 
     const StatsBox = styled.section`
@@ -106,6 +107,10 @@ const UniqueCards: React.FC = () => {
         padding: 10px;
         font-size: 1.2em;
         text-shadow: 2px 2px #3b4cca;
+        
+        @media (max-width: 480px) {
+            border: none;
+        }
 
     `
     const AbilitiesBox = styled.section`
@@ -116,7 +121,9 @@ const UniqueCards: React.FC = () => {
         text-shadow: 2px 2px #3b4cca;
         line-height: 1.6; 
 
-
+        @media (max-width: 480px) {
+            border: none;
+        }
     `
     const DescriptionBox = styled.section`
         font-size: 1.2em;
@@ -131,6 +138,11 @@ const UniqueCards: React.FC = () => {
         font-size: 1.2em;
         text-shadow: 2px 2px #3b4cca;
         border-right: solid 1px;
+
+        @media (max-width: 480px) {
+            border: none;
+        }
+
     `
     const BoxChildren = styled.div`
         color: white;
@@ -167,7 +179,7 @@ const UniqueCards: React.FC = () => {
 
                 <StatsContainer>
                     <StatsBox>
-                        <h1>Base Stats</h1>
+                        <h2>Base Stats</h2>
                         <BoxChildren>
                             {pokemonData && pokemonData.stats.map((stat: any) => (
                                 <p key={stat.stat.name}> {stat.stat.name.toUpperCase()}: {stat.base_stat} </p>
@@ -209,13 +221,14 @@ const UniqueCards: React.FC = () => {
                         </BoxChildren>
                     </DescriptionBox>
 
-                    <EvolutionContainer>
+                </StatsContainer>
+                <EvolutionContainer>
                         <EvolutionTitle>Evolution Chain</EvolutionTitle>
                         {evolutionChain && (
                             <EvolutionChain chain={evolutionChain} />
                         )}
                     </EvolutionContainer>
-                </StatsContainer>
+
             </GridContainer>
         </>
     );
